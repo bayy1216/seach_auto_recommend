@@ -27,27 +27,20 @@ class SearchQueryConsumer(
     fun consume(event: ArticleEvent.Search) {
         logger.info("SearchQueryConsumer consume: $event")
 
-        val bulkOps: BulkOperations =
-            mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, SearchRecommend::class.java)
-
         // 1. 존재하면 count +1
         val existing = searchRepository.findByQuery(event.query)
         if (existing != null) {
             logger.info("Updating count for existing query: ${event.query}")
-            bulkOps.updateOne(
-                Query(Criteria.where("query").`is`(event.query)),
-                Update().inc("count", 1).currentDate("updatedAt")
-            )
+            searchRepository.addCountByQuery(event.query, 1)
         } else {
             // 2. 없으면 새로 생성. prefix 검색어도 count 0으로 생성
-            createNewSearchRecommend(event, bulkOps)
+            createNewSearchRecommend(event)
         }
-
-
-        bulkOps.execute()
     }
 
-    private fun createNewSearchRecommend(event: ArticleEvent.Search, bulkOps: BulkOperations) {
+    private fun createNewSearchRecommend(event: ArticleEvent.Search) {
+        val bulkOps: BulkOperations =
+            mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, SearchRecommend::class.java)
         val searchRecommend = SearchRecommend.of(event.query)
         val prefixRecommends = event.generatePrefixQueries()
 
@@ -65,6 +58,8 @@ class SearchQueryConsumer(
         // 주 검색어 추가
         logger.info("Inserting new search recommend: ${searchRecommend.query}")
         bulkOps.insert(searchRecommend)
+
+        bulkOps.execute()
     }
 
     companion object {

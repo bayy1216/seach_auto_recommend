@@ -40,5 +40,5 @@ out/
 .kotlin
 
 
-./data
-./mysql-data
+/data/
+/mysql-data/

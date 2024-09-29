@@ -3,6 +3,7 @@ package com.reditus.search.article
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.data.web.PageableDefault
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
@@ -37,7 +38,8 @@ class ArticleController(
     fun getArticle(
         @PathVariable("id") id: Long
     ): ArticleRes.ArticleMeta {
-        val article = articleRepository.findById(id).get()
+        val article = articleRepository.findByIdOrNull(id)
+            ?: throw NoSuchElementException("Article not found")
         return ArticleRes.ArticleMeta.from(article)
     }
 

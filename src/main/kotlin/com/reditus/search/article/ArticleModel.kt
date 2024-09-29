@@ -1,5 +1,6 @@
 package com.reditus.search.article
 
+
 class ArticleModel{
     data class Meta(
         val id: Long,
@@ -19,5 +20,11 @@ class ArticleModel{
 class ArticleEvent{
     data class Search(
         val query: String
-    )
+    ){
+        fun generatePrefixQueries(): List<String>{
+            return (1 until query.length).map { index ->
+                query.substring(0, index)
+            }
+        }
+    }
 }

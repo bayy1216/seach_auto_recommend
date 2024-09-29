@@ -22,20 +22,23 @@ class SearchBatchUseCase(
 
         // 1. 최근에 count가 업데이트된 검색어를 가져옴
         val searchRecommends: List<SearchRecommend> =
-            searchRepository.findAllByUpdatedAtAfter(LocalDateTime.now().minusDays(1))
+            searchRepository.findAllByUpdatedAtAfterAndCountGreaterThan(
+                updatedAt = LocalDateTime.now().minusDays(1),
+                count = 0,
+            )
 
 
-        searchRecommends.forEach {newSearch ->
+        searchRecommends.forEach { newSearch ->
+            if (newSearch.query.length < 2) return@forEach
             println("search: ${newSearch.count} ${newSearch.query}")
             // 2. 해당 검석어의 recommend의 count top5보다 count가 높은 상위 검색어에만 저장
             val topSearches = getTopSearches(newSearch.getSearchCount())
-            topSearches.forEach{topSearch->
+            topSearches.forEach { topSearch ->
                 println("top search: ${topSearch.query} ${topSearch.count}")
                 topSearch.addRecommendAndCompaction(newSearch.getSearchCount())
             }
             searchRepository.saveAll(topSearches)
         }
-
 
 
     }
@@ -65,12 +68,12 @@ class SearchBatchUseCase(
 private fun String.toPrefixRecommendOrCriteria(): Criteria {
     // abcd-> a, ab, abc
     val prefixQueries = mutableListOf<String>()
-    for(i in 1 until this.length){
+    for (i in 1 until this.length) {
         prefixQueries.add(this.substring(0, i))
     }
 
     // query가 prefixQueries에 포함되는 경우
-    val titleCriteria= prefixQueries.map {
+    val titleCriteria = prefixQueries.map {
         Criteria.where("query").isEqualTo(it)
     }
     return Criteria().orOperator(*titleCriteria.toTypedArray()) // OR로 결합

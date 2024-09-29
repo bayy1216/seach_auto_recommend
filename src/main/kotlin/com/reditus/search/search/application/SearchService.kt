@@ -24,5 +24,7 @@ fun SearchRecommend.toRecommend(): List<String> {
     // 본인 + 하부 추천어
     val recommendations = recommend + getSearchCount()
 
-    return recommendations.sortedByDescending { it.count }.map { it.query }
+    return recommendations
+        .filter { it.count > 0 }
+        .sortedByDescending { it.count }.map { it.query }
 }

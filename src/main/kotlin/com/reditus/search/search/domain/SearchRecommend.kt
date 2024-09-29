@@ -38,10 +38,10 @@ class SearchRecommend(
     }
 
     companion object{
-        fun of(query: String): SearchRecommend {
+        fun of(query: String, count: Int = 1): SearchRecommend {
             return SearchRecommend(
                 query = query,
-                count = 1
+                count = count
             )
         }
     }

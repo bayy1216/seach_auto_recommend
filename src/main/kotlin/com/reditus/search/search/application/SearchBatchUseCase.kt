@@ -30,11 +30,10 @@ class SearchBatchUseCase(
 
         searchRecommends.forEach { newSearch ->
             if (newSearch.query.length < 2) return@forEach
-            println("search: ${newSearch.count} ${newSearch.query}")
+
             // 2. 해당 검석어의 recommend의 count top5보다 count가 높은 상위 검색어에만 저장
             val topSearches = getTopSearches(newSearch.getSearchCount())
             topSearches.forEach { topSearch ->
-                println("top search: ${topSearch.query} ${topSearch.count}")
                 topSearch.addRecommendAndCompaction(newSearch.getSearchCount())
             }
             searchRepository.saveAll(topSearches)

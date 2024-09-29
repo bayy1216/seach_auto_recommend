@@ -1,6 +1,8 @@
-package com.reditus.search.search
+package com.reditus.search.search.application
 
 import com.reditus.search.article.ArticleEvent
+import com.reditus.search.search.domain.SearchRecommend
+import com.reditus.search.search.infrastructure.SearchRepository
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.EventListener
 import org.springframework.data.mongodb.core.BulkOperations

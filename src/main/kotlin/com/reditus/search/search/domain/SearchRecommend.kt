@@ -1,9 +1,10 @@
-package com.reditus.search.search
+package com.reditus.search.search.domain
 
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed
+import java.time.LocalDateTime
 
 
 @Document(collection = "search_recommend")
@@ -16,13 +17,14 @@ class SearchRecommend(
     val query: String,
     var count: Int,
     val recommend: List<SearchCount> = emptyList(),
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
 
     val searchCount: SearchCount
         get() = SearchCount(query, count)
 
     companion object{
-        fun of(query: String): SearchRecommend{
+        fun of(query: String): SearchRecommend {
             return SearchRecommend(
                 query = query,
                 count = 1

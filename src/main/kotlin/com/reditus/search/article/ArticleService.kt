@@ -14,6 +14,7 @@ class ArticleService(
     @Transactional(readOnly = true)
     fun getArticlePaging(query: String?, pageable:Pageable): List<ArticleModel.Meta> {
         val page = if(query !=null){
+            applicationEventPublisher.publishEvent(ArticleEvent.Search(query))
             articleRepository.findAllByTitleContaining(query, pageable)
         }else{
             articleRepository.findAll(pageable)
@@ -24,7 +25,6 @@ class ArticleService(
     @Transactional(readOnly = true)
     fun getArticle(id: Long): ArticleModel.Meta {
         val article = articleRepository.findByIdOrNull(id) ?: throw NoSuchElementException("Article not found")
-        applicationEventPublisher.publishEvent(ArticleEvent.Search(article.title))
         return ArticleModel.Meta.from(article)
     }
 

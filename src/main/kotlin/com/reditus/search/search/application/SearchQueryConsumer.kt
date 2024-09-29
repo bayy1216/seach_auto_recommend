@@ -31,7 +31,7 @@ class SearchQueryConsumer(
         searchRepository.findByQuery(event.query)?.let {
             bulkOps.updateOne(
                 Query(Criteria.where("query").`is`(event.query)),
-                Update().inc("count", 1)
+                Update().inc("count", 1).currentDate("updatedAt")
             ).execute()
             return
         }

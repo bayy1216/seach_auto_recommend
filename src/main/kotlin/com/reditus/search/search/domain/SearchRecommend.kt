@@ -16,12 +16,26 @@ class SearchRecommend(
     @Indexed(unique = true)
     val query: String,
     var count: Int,
-    val recommend: List<SearchCount> = emptyList(),
+    val recommend: MutableList<SearchCount> = mutableListOf(),
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
 
-    val searchCount: SearchCount
-        get() = SearchCount(query, count)
+    fun getSearchCount(): SearchCount{
+        return SearchCount(query, count)
+    }
+
+    /**
+     * 추천어 추가 및 정렬 수행
+     * 이후 추천어 리스트가 size를 초과하면 마지막 요소 삭제
+     */
+    fun addRecommendAndCompaction(searchCount: SearchCount, size: Int = 5) {
+        recommend.removeIf { it.query == searchCount.query }
+        recommend.add(searchCount)
+        recommend.sortByDescending { it.count }
+        if(recommend.size > size) {
+            recommend.removeAt(recommend.size - 1)
+        }
+    }
 
     companion object{
         fun of(query: String): SearchRecommend {

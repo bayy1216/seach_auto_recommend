@@ -13,12 +13,16 @@ class SearchService(
 
         return searchRecommend?.toRecommend() ?: emptyList()
     }
+
+    fun getAll(): List<SearchRecommend> {
+        return searchRepository.findAll()
+    }
 }
 
 
 fun SearchRecommend.toRecommend(): List<String> {
     // 본인 + 하부 추천어
-    val recommendations = recommend + searchCount
+    val recommendations = recommend + getSearchCount()
 
     return recommendations.sortedByDescending { it.count }.map { it.query }
 }

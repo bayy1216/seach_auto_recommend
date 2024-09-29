@@ -32,9 +32,11 @@ spring: # test profile
         core-size: 8
         max-size: 16
 logging:
-  level.org.hibernate:
-    orm.jdbc.bind: trace
-    SQL: debug
+  level:
+    org.springframework.data.mongodb: DEBUG
+    org.hibernate:
+      orm.jdbc.bind: trace
+      SQL: debug
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8

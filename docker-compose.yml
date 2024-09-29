@@ -1,0 +1,24 @@
+version: '3'
+# 실행명령어
+services:
+  search-mysql:
+    image: mysql
+    restart: always
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: search
+      MYSQL_ROOT_PASSWORD: root
+  search-mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    restart: always
+    volumes:
+      - ./data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: search

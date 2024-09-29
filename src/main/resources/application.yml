@@ -1,0 +1,46 @@
+spring: # test profile
+  datasource:
+    url: jdbc:mysql://localhost:3306/search?createDatabaseIfNotExist=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+  data:
+    mongodb:
+      uri: mongodb://root:root@localhost:27017/search?authSource=admin
+      authentication-database: admin
+  sql.init.mode: never
+  flyway:
+    enabled: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  lifecycle:
+    timeout-per-shutdown-phase: 15s # ???? ???? ?? ??? ???? ?? ???? ??
+  task:
+    execution:
+      pool:
+        core-size: 8
+        max-size: 16
+logging:
+  level.org.hibernate:
+    orm.jdbc.bind: trace
+    SQL: debug
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  use-fqn: true
+server:
+  shutdown: graceful
+  tomcat:
+    connection-timeout: 3s
+    keep-alive-timeout: 15s

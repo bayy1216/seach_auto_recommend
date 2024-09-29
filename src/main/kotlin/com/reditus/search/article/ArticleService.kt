@@ -14,7 +14,9 @@ class ArticleService(
     @Transactional(readOnly = true)
     fun getArticlePaging(query: String?, pageable:Pageable): List<ArticleModel.Meta> {
         val page = if(query !=null){
-            applicationEventPublisher.publishEvent(ArticleEvent.Search(query))
+            if(query.length in 2..40){
+                applicationEventPublisher.publishEvent(ArticleEvent.Search(query))
+            }
             articleRepository.findAllByTitleContaining(query, pageable)
         }else{
             articleRepository.findAll(pageable)

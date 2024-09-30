@@ -3,11 +3,9 @@ package com.reditus.search.search.application
 import com.reditus.search.search.domain.SearchCount
 import com.reditus.search.search.domain.SearchRecommend
 import com.reditus.search.search.infrastructure.SearchRepository
-import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.data.mongodb.core.query.Criteria
-import org.springframework.data.mongodb.core.query.Query
-import org.springframework.data.mongodb.core.query.isEqualTo
+import org.springframework.data.mongodb.core.find
+import org.springframework.data.mongodb.core.query.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
@@ -53,11 +51,10 @@ class SearchBatchUseCase(
             //TODO :searchCount.count가 recommend 리스트의 최소 count보다 큰 경우만 가져오기
         )
 
-        val query = Query(criteria).limit(5)
-            .with(Sort.by(Sort.Direction.DESC, "count")) // 상위 5개 가져오기, 해당 쿼리에서 count가 높은 5개 반환
-
         // 결과를 List<SearchCount>로 변환
-        return mongoTemplate.find(query, SearchRecommend::class.java)
+        return mongoTemplate.find<SearchRecommend>(
+            Query(criteria)
+        )
     }
 }
 
@@ -65,15 +62,9 @@ class SearchBatchUseCase(
  * 해당 검색어의 prefix 검색어를 OR로 결합한 Criteria 반환
  */
 private fun String.toPrefixRecommendOrCriteria(): Criteria {
-    // abcd-> a, ab, abc
-    val prefixQueries = mutableListOf<String>()
-    for (i in 1 until this.length) {
-        prefixQueries.add(this.substring(0, i))
-    }
-
-    // query가 prefixQueries에 포함되는 경우
-    val titleCriteria = prefixQueries.map {
-        Criteria.where("query").isEqualTo(it)
-    }
-    return Criteria().orOperator(*titleCriteria.toTypedArray()) // OR로 결합
+    // abcd-> a, ab, abc | title equals 쿼리 criteria 생성
+    val titleCriteria = (1 until this.length)
+        .map { this.substring(0, it) }
+        .map { SearchRecommend::query isEqualTo it }
+    return Criteria().orOperator(titleCriteria) // OR로 결합
 }
